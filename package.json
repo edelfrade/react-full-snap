@@ -1,0 +1,45 @@
+{
+  "name": "react-full-snap",
+  "version": "0.0.30",
+  "description": "Full page scrolling with React",
+  "main": "./lib",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "start": "webpack-dev-server",
+    "example": "webpack -p",
+    "prepublish": "./node_modules/.bin/babel ./src --out-dir ./lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zwug/react-full-snap.git"
+  },
+  "author": "Kirill Mironov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zwug/react-full-snap/issues"
+  },
+  "homepage": "https://github.com/zwug/react-full-snap#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-eslint": "^8.0.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.3.13",
+    "babel-preset-stage-0": "^6.3.13",
+    "eslint": "^4.7.0",
+    "eslint-plugin-react": "^7.3.0",
+    "html-webpack-plugin": "^2.30.1",
+    "prop-types": "^15.6.2",
+    "react": "16.2.0",
+    "react-dom": "16.2.0",
+    "webpack": "^3.6.0",
+    "webpack-dev-server": "^2.8.2"
+  },
+  "peerDependencies": {
+    "react": "16.2.0",
+    "react-dom": "^16.2.0"
+  }
+}
