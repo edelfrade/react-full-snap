@@ -6,7 +6,7 @@ import animatedScrollTo from '../utils/animated-scroll-to';
 class FullPage extends React.Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
-    containerClass: PropTypes.string,
+    className: PropTypes.string,
     initialSlide: PropTypes.number,
     windowScroll: PropTypes.bool,
     snap: PropTypes.bool,
@@ -17,7 +17,7 @@ class FullPage extends React.Component {
   };
 
   static defaultProps = {
-    containerClass: 'snap-container',
+    className: 'snap-container',
     initialSlide: 0,
     windowScroll: true,
     snap: true,
@@ -30,10 +30,7 @@ class FullPage extends React.Component {
     super(props);
     this.myRef;
     this.newTouch = false;
-    this.wheelScrolling = false;
-    this.canScroll = true;
     this.scrollPending = false;
-    this.scrolledAlready = false;
     this.slidesCount = React.Children.toArray(props.children).filter(child => {
       return child.type.displayName !== 'ControlledComponent';
     }).length;
@@ -43,11 +40,8 @@ class FullPage extends React.Component {
     this.touchSensitivity = 5;
     this.touchStart = 0;
 
-    this.scrollIncrement = 0;
-    this.scrollIncreasing = false;
-    this.scrollDecreasing = false;
-
-    this.instantScrolling = false;
+    this._isNewScrollAction = true;
+    this._wheel = { increasing: true, lastDeltaY: 0 };
 
     this.state = {
       activeSlide: props.initialSlide
@@ -78,9 +72,8 @@ class FullPage extends React.Component {
   }
 
   setHeights = () => {
-    if (!this.scrollPending && !this.instantScrolling) {
+    if (!this.scrollPending) {
       this.setState({ height: this.props.containerHeight ? this.props.containerHeight : window.innerHeight });
-      this.scrollToSlideInstant();
     } else {
       setTimeout(() => {
         this.setHeights();
@@ -88,29 +81,15 @@ class FullPage extends React.Component {
     }
   };
 
-  scrollToSlideInstant() {
-    if (!this.scrollPending && this.state.activeSlide >= 0 && this.state.activeSlide < this.slidesCount && !this.instantScrolling) {
-      this.scrollPending = true;
-      this.instantScrolling = true;
-      animatedScrollTo(this.props.containerHeight ? this.props.containerHeight : window.innerHeight * this.state.activeSlide, 45, this.myRef, this.props.windowScroll, () => {
-        this.scrollPending = false;
-        this.instantScrolling = false;
-        this.scrolledAlready = true;
-      });
-    }
-  }
   scrollToSlide(slide) {
     if (!this.scrollPending && slide >= 0 && slide < this.slidesCount) {
       const currentSlide = this.state.activeSlide;
       this.props.beforeChange({ from: currentSlide, to: slide });
-      this.setState({
-        activeSlide: slide
-      });
+      this.setState({ activeSlide: slide });
 
       this.scrollPending = true;
       animatedScrollTo(this.props.containerHeight ? this.props.containerHeight : window.innerHeight * slide, this.props.duration, this.myRef, this.props.windowScroll, () => {
         this.scrollPending = false;
-        this.scrolledAlready = true;
         this.props.afterChange({ from: currentSlide, to: slide });
       });
     }
@@ -119,7 +98,7 @@ class FullPage extends React.Component {
   onTouchStart = e => {
     if (this.props.snap) {
       this.touchStart = e.touches[0].clientY;
-      this.scrolledAlready = false;
+      this.scrollPending = true;
       this.newTouch = true;
     }
   };
@@ -133,7 +112,7 @@ class FullPage extends React.Component {
     if (this.props.snap) {
       e.preventDefault();
       const touchEnd = e.changedTouches[0].clientY;
-      if (!this.scrollPending && !this.scrolledAlready && this.newTouch) {
+      if (!this.scrollPending && this.newTouch) {
         if (this.touchStart > touchEnd + this.touchSensitivity) {
           this.scrollToSlide(this.state.activeSlide + 1);
         } else if (this.touchStart < touchEnd - this.touchSensitivity) {
@@ -156,54 +135,39 @@ class FullPage extends React.Component {
   };
 
   onScroll = e => {
-    if (this.props.snap) {
-      var deltaY = Math.abs(e.deltaY);
-      if (deltaY > this.scrollIncrement && !this.scrollIncreasing) {
-        this.scrollIncreasing = true;
-        this.scrollDecreasing = false;
-        this.canScroll = true;
-      } else {
-        this.canScroll = false;
-        if (deltaY < this.scrollIncrement) {
-          this.scrollDecreasing = true;
-          this.scrollIncreasing = false;
-        }
-      }
+    if (!this.props.snap) {
+      return;
+    }
+    e.preventDefault();
+    if (this.scrollPending) {
+      return false;
+    }
 
-      this.scrollIncrement = deltaY;
-      const scrollDown = (e.wheelDelta || -e.deltaY || -e.detail) < 0;
-      if (!this.slideElements[this.state.activeSlide].props.footerSlide) {
-        e.preventDefault();
-        if (this.scrollPending) {
-          return false;
-        }
-
-        // const scrollDown = (e.wheelDelta || -e.deltaY || -e.detail) < 0;
-        let activeSlide = this.state.activeSlide;
-
-        if (scrollDown) {
-          activeSlide++;
-        } else {
-          activeSlide--;
-        }
-        if (this.canScroll) {
-          this.scrollToSlide(activeSlide);
-        }
-      } else {
-        if (this.scrollPending) {
-          e.preventDefault();
-        } else if (!scrollDown) {
-          e.preventDefault();
-          if (this.scrollPending) {
-            return false;
-          }
-          if (this.canScroll) {
-            /**todo: this is not working as it should */
-            this.scrollToSlide(this.state.activeSlide - 1);
-          }
-        }
+    const deltaY = Math.abs(e.deltaY);
+    if (deltaY > this._wheel.lastDeltaY && !this._wheel.increasing) {
+      this._wheel.increasing = true;
+      this._isNewScrollAction = true;
+    } else {
+      this._isNewScrollAction = false;
+      if (deltaY < this._wheel.lastDeltaY) {
+        this._wheel.increasing = false;
       }
     }
+    this._wheel.lastDeltaY = deltaY;
+
+    if (!this._isNewScrollAction) {
+      return;
+    }
+
+    const scrollDown = (e.wheelDelta || -e.deltaY || -e.detail) < 0;
+    let activeSlide = this.state.activeSlide;
+
+    if (scrollDown) {
+      activeSlide++;
+    } else {
+      activeSlide--;
+    }
+    this.scrollToSlide(activeSlide);
   };
 
   scrollNext() {
@@ -234,7 +198,7 @@ class FullPage extends React.Component {
     return (
       <Provider {...controls}>
         <div
-          className={this.props.containerClass}
+          className={this.props.className}
           ref={ref => (this.myRef = ref)}
           style={this.props.windowScroll ? { height: this.state.height } : { height: this.state.height, width: '100%', position: 'fixed', overflowY: 'scroll' }}
         >
