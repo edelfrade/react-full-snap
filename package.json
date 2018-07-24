@@ -1,7 +1,7 @@
 {
   "name": "react-full-snap",
   "version": "0.0.30",
-  "description": "Full page scrolling with React",
+  "description": "Full page snap scrolling with React",
   "main": "./lib",
   "directories": {
     "example": "examples"
@@ -13,14 +13,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zwug/react-full-snap.git"
+    "url": "git+https://github.com/ernerock/react-full-snap.git"
   },
-  "author": "Kirill Mironov",
+  "author": "Ernesto del Frade",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/zwug/react-full-snap/issues"
+    "url": "https://github.com/ernerock/react-full-snap/issues"
   },
-  "homepage": "https://github.com/zwug/react-full-snap#readme",
+  "homepage": "https://github.com/ernerock/react-full-snap#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
