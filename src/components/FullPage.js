@@ -88,7 +88,7 @@ class FullPage extends React.Component {
       this.setState({ activeSlide: slide });
 
       this.scrollPending = true;
-      animatedScrollTo(this.props.containerHeight ? this.props.containerHeight : window.innerHeight * slide, this.props.duration, this.myRef, this.props.windowScroll, () => {
+      animatedScrollTo(this.props.containerHeight ? this.props.containerHeight * slide : window.innerHeight * slide, this.props.duration, this.myRef, this.props.windowScroll, () => {
         this.scrollPending = false;
         this.props.afterChange({ from: currentSlide, to: slide });
       });

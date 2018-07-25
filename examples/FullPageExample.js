@@ -30,7 +30,7 @@ const Controls = withControls(controls => {
 class FullPageExample extends React.Component {
   render() {
     return (
-      <FullPage className={'my-container'} snap={true} windowScroll={false}>
+      <FullPage className={'my-container'} containerHeight={window.innerHeight - 70} snap={true} windowScroll={false}>
         <Controls />
         <Slide height={`100%`} style={{ background: '#2ECC40', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <h1>1</h1>
