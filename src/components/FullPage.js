@@ -99,7 +99,6 @@ class FullPage extends React.Component {
   onTouchStart = e => {
     if (this.props.snap) {
       this.touchStart = e.touches[0].clientY;
-      this.scrollPending = true;
       this.newTouch = true;
     }
   };
