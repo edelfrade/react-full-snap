@@ -30,25 +30,30 @@ const Controls = withControls(controls => {
 class FullPageExample extends React.Component {
   render() {
     return (
-      <FullPage className={'my-container'} containerHeight={window.innerHeight - 70} snap={true} windowScroll={false}>
-        <Controls />
-        <Slide height={`100%`} style={{ background: '#2ECC40', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <h1>1</h1>
-        </Slide>
-        <Slide style={{ background: '#0074D9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <h1>2</h1>
-        </Slide>
-        <Slide style={{ background: '#d52685', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <h1>3</h1>
-        </Slide>
-        <Slide height={'70px'} style={{ background: '#00c4ff', padding: '20px 0' }}>
-          <h1>4</h1>
-          <p>Lorem </p>
-          <p>Lorem </p>
-          <p>Lorem </p>
-          <p>Lorem </p>
-        </Slide>
-      </FullPage>
+      <div>
+        <div style={{ height: '70px', position: 'fixed', top: 0, left: 0 }}>
+          <p>HEADER</p>
+        </div>
+        <FullPage offset={70} className={'my-container'} snap={true} windowScroll={false}>
+          <Controls />
+          <Slide height={`100%`} style={{ background: '#2ECC40', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <h1>1</h1>
+          </Slide>
+          <Slide style={{ background: '#0074D9', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <h1>2</h1>
+          </Slide>
+          <Slide style={{ background: '#d52685', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <h1>3</h1>
+          </Slide>
+          <Slide height={'70px'} style={{ background: '#00c4ff', padding: '20px 0' }}>
+            <h1>4</h1>
+            <p>Lorem </p>
+            <p>Lorem </p>
+            <p>Lorem </p>
+            <p>Lorem </p>
+          </Slide>
+        </FullPage>
+      </div>
     );
   }
 }

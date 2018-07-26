@@ -13,7 +13,7 @@ class FullPage extends React.Component {
     duration: PropTypes.number,
     beforeChange: PropTypes.func,
     afterChange: PropTypes.func,
-    containerHeight: PropTypes.number
+    offset: PropTypes.number
   };
 
   static defaultProps = {
@@ -22,6 +22,7 @@ class FullPage extends React.Component {
     windowScroll: true,
     snap: true,
     duration: 700,
+    offset: 0,
     beforeChange: () => {},
     afterChange: () => {}
   };
@@ -73,7 +74,7 @@ class FullPage extends React.Component {
 
   setHeights = () => {
     if (!this.scrollPending) {
-      this.setState({ height: this.props.containerHeight ? this.props.containerHeight : window.innerHeight });
+      this.setState({ height: window.innerHeight - this.props.offset });
     } else {
       setTimeout(() => {
         this.setHeights();
@@ -88,7 +89,7 @@ class FullPage extends React.Component {
       this.setState({ activeSlide: slide });
 
       this.scrollPending = true;
-      animatedScrollTo(this.props.containerHeight ? this.props.containerHeight * slide : window.innerHeight * slide, this.props.duration, this.myRef, this.props.windowScroll, () => {
+      animatedScrollTo((window.innerHeight - this.props.offset) * slide, this.props.duration, this.myRef, this.props.windowScroll, () => {
         this.scrollPending = false;
         this.props.afterChange({ from: currentSlide, to: slide });
       });
@@ -200,7 +201,7 @@ class FullPage extends React.Component {
         <div
           className={this.props.className}
           ref={ref => (this.myRef = ref)}
-          style={this.props.windowScroll ? { height: this.state.height } : { height: this.state.height, width: '100%', position: 'fixed', overflowY: 'scroll' }}
+          style={this.props.windowScroll ? { height: this.state.height } : { height: this.state.height, width: '100%', position: 'fixed', overflowY: 'scroll', top: this.props.offset }}
         >
           {this.props.children}
         </div>
