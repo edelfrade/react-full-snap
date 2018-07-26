@@ -3,7 +3,7 @@ import React from 'react';
 
 const Wrapper = props => {
   return (
-    <div className={props.className} style={Object.assign({}, props.style, props.footerSlide ? { height: props.height, overflowY: 'scroll' } : { height: props.height, touchAction: 'none' })}>
+    <div className={props.className} style={Object.assign({}, props.style, { height: props.height, touchAction: 'none', overflow: 'hidden' })}>
       {props.children}
     </div>
   );
@@ -12,22 +12,17 @@ class Slide extends React.Component {
   static propTypes = {
     children: PropTypes.node,
     style: PropTypes.object,
-    footerSlide: PropTypes.bool,
     height: PropTypes.string
   };
 
   static defaultProps = {
-    footerSlide: false,
     height: '100%',
     className: ''
   };
 
   render() {
     return (
-      <Wrapper
-        {...this.props}
-        style={Object.assign({}, this.props.style, this.props.footerSlide ? { height: this.props.height, overflowY: 'scroll' } : { height: this.props.height, touchAction: 'none' })}
-      >
+      <Wrapper {...this.props} style={Object.assign({}, this.props.style, { height: this.props.height, touchAction: 'none', overflow: 'hidden' })}>
         {this.props.children}
       </Wrapper>
     );

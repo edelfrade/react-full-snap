@@ -41,7 +41,7 @@ class FullPageExample extends React.Component {
         <Slide style={{ background: '#d52685', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <h1>3</h1>
         </Slide>
-        <Slide height={'70px'} footerSlide style={{ background: '#00c4ff', padding: '20px 0' }}>
+        <Slide height={'70px'} style={{ background: '#00c4ff', padding: '20px 0' }}>
           <h1>4</h1>
           <p>Lorem </p>
           <p>Lorem </p>
