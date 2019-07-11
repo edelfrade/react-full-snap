@@ -14,6 +14,7 @@ Used for personal projects while PRs are merged to main repo
 - Enable the plugin to be used inside an element, scrolling inside that element instead of the window. This, paired with mobile resize fix will solve the resizing when scrolling on mobile devices
 - Change hight of container when using container scrolling to other than full-height
 - Custom classes for container and slides
+- Rewritten to an overflow hidden container to avoid scrollbar and account for modern browsers scroll handlers
 
 ### Original Instructions
 

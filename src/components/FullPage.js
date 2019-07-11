@@ -8,7 +8,6 @@ class FullPage extends React.Component {
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
     initialSlide: PropTypes.number,
-    windowScroll: PropTypes.bool,
     snap: PropTypes.bool,
     duration: PropTypes.number,
     beforeChange: PropTypes.func,
@@ -19,10 +18,10 @@ class FullPage extends React.Component {
   static defaultProps = {
     className: 'snap-container',
     initialSlide: 0,
-    windowScroll: true,
     snap: true,
     duration: 700,
     offset: 0,
+    sensitivity: 5,
     beforeChange: () => {},
     afterChange: () => {}
   };
@@ -31,14 +30,13 @@ class FullPage extends React.Component {
     super(props);
     this.myRef;
     this.newTouch = false;
-    this.scrollPending = false;
+    this.scrolling = false;
     this.slidesCount = React.Children.toArray(props.children).filter(child => {
       return child.type.displayName !== 'ControlledComponent';
     }).length;
     this.slideElements = React.Children.toArray(props.children).filter(child => {
       return child.type.displayName !== 'ControlledComponent';
     });
-    this.touchSensitivity = 5;
     this.touchStart = 0;
 
     this._isNewScrollAction = true;
@@ -50,31 +48,29 @@ class FullPage extends React.Component {
   }
 
   componentDidMount() {
-    document.addEventListener('touchmove', this.onTouchMove);
-    document.addEventListener('touchstart', this.onTouchStart);
+    document.addEventListener('touchmove', this.onTouchMove, { passive: false });
+    document.addEventListener('touchstart', this.onTouchStart, { passive: false });
     document.addEventListener('touchend', this.onTouchEnd);
-    document.addEventListener('wheel', this.onScroll, false);
+    document.addEventListener('wheel', this.onScroll, { passive: false });
     window.addEventListener('resize', this.setHeights);
-
     document.addEventListener('keydown', this.onKeyPress);
-
     this.setHeights();
-    this.scrollToSlide(this.props.initialSlide);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('touchmove', this.onTouchMove);
-    document.removeEventListener('touchstart', this.onTouchStart);
+    document.removeEventListener('touchmove', this.onTouchMove, { passive: false });
+    document.removeEventListener('touchstart', this.onTouchStart, { passive: false });
     document.removeEventListener('touchend', this.onTouchEnd);
-    document.removeEventListener('wheel', this.onScroll);
+    document.removeEventListener('wheel', this.onScroll, { passive: false });
     window.removeEventListener('resize', this.setHeights);
 
     document.removeEventListener('keydown', this.onKeyPress);
   }
 
   setHeights = () => {
-    if (!this.scrollPending) {
-      this.setState({ height: window.innerHeight - this.props.offset });
+    const { offset } = this.props;
+    if (!this.scrolling) {
+      this.setState({ height: window.innerHeight - offset });
     } else {
       setTimeout(() => {
         this.setHeights();
@@ -83,39 +79,43 @@ class FullPage extends React.Component {
   };
 
   scrollToSlide(slide) {
-    if (!this.scrollPending && slide >= 0 && slide < this.slidesCount) {
-      const currentSlide = this.state.activeSlide;
-      this.props.beforeChange({ from: currentSlide, to: slide });
+    const { duration, beforeChange, afterChange } = this.props;
+    const { activeSlide, height } = this.state;
+    if (!this.scrolling && slide >= 0 && slide < this.slidesCount) {
+      this.newTouch = false;
+      const currentSlide = activeSlide;
+      beforeChange({ from: currentSlide, to: slide });
       this.setState({ activeSlide: slide });
 
-      this.scrollPending = true;
-      animatedScrollTo((window.innerHeight - this.props.offset) * slide, this.props.duration, this.myRef, this.props.windowScroll, () => {
-        this.scrollPending = false;
-        this.props.afterChange({ from: currentSlide, to: slide });
+      this.scrolling = true;
+      animatedScrollTo(height * slide, duration, this.myRef, () => {
+        this.scrolling = false;
+        afterChange({ from: currentSlide, to: slide });
       });
     }
   }
 
   onTouchStart = e => {
-    if (this.props.snap) {
+    const { snap } = this.props;
+    if (snap) {
       this.touchStart = e.touches[0].clientY;
-      this.newTouch = true;
     }
   };
   onTouchEnd = () => {
     if (this.props.snap) {
-      this.newTouch = false;
+      this.newTouch = true;
     }
   };
 
   onTouchMove = e => {
-    if (this.props.snap) {
+    const { sensitivity, snap } = this.props;
+    if (snap) {
       e.preventDefault();
       const touchEnd = e.changedTouches[0].clientY;
-      if (!this.scrollPending && this.newTouch) {
-        if (this.touchStart > touchEnd + this.touchSensitivity) {
+      if (!this.scrolling && this.newTouch) {
+        if (this.touchStart > touchEnd + sensitivity) {
           this.scrollToSlide(this.state.activeSlide + 1);
-        } else if (this.touchStart < touchEnd - this.touchSensitivity) {
+        } else if (this.touchStart < touchEnd - sensitivity) {
           this.scrollToSlide(this.state.activeSlide - 1);
         }
       }
@@ -139,7 +139,7 @@ class FullPage extends React.Component {
       return;
     }
     e.preventDefault();
-    if (this.scrollPending) {
+    if (this.scrolling) {
       return false;
     }
 
@@ -200,7 +200,7 @@ class FullPage extends React.Component {
         <div
           className={this.props.className}
           ref={ref => (this.myRef = ref)}
-          style={this.props.windowScroll ? { height: this.state.height } : { height: this.state.height, width: '100%', position: 'fixed', overflowY: 'scroll', top: this.props.offset }}
+          style={{ height: this.state.height, width: '100%', position: 'fixed', overflow: 'hidden', top: this.props.offset }}
         >
           {this.props.children}
         </div>

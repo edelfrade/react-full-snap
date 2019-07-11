@@ -1,6 +1,6 @@
 {
   "name": "react-full-snap",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "Full page snap scrolling with React",
   "main": "./lib",
   "directories": {

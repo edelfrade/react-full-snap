@@ -34,7 +34,7 @@ class FullPageExample extends React.Component {
         <div style={{ height: '70px', position: 'fixed', top: 0, left: 0 }}>
           <p>HEADER</p>
         </div>
-        <FullPage offset={70} className={'my-container'} snap={true} windowScroll={false}>
+        <FullPage offset={70} className={'my-container'} snap={true}>
           <Controls />
           <Slide height={`100%`} style={{ background: '#2ECC40', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <h1>1</h1>
