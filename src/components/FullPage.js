@@ -55,6 +55,9 @@ class FullPage extends React.Component {
     window.addEventListener('resize', this.setHeights);
     document.addEventListener('keydown', this.onKeyPress);
     this.setHeights();
+    document.getElementsByTagName("html")[0].style = 'overscroll-behavior-y: contain';
+    document.getElementsByTagName("body")[0].style = 'overscroll-behavior-y: contain';
+
   }
 
   componentWillUnmount() {
@@ -65,6 +68,8 @@ class FullPage extends React.Component {
     window.removeEventListener('resize', this.setHeights);
 
     document.removeEventListener('keydown', this.onKeyPress);
+    document.getElementsByTagName("html")[0].style = 'overscroll-behavior-y: auto';
+    document.getElementsByTagName("body")[0].style = 'overscroll-behavior-y: auto';
   }
 
   setHeights = () => {
